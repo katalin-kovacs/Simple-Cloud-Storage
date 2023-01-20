@@ -1,3 +1,5 @@
+import { File } from "./types";
+
 async function getFiles() {
   let url = "http://localhost:5500/list";
 
@@ -12,7 +14,7 @@ async function getFiles() {
 async function renderFiles() {
   let files = await getFiles();
 
-  files.forEach((file) => {
+  files.forEach((file: File) => {
     appendData(file);
   });
 }
@@ -21,18 +23,28 @@ renderFiles();
 async function uploadFile() {
   let url = "http://localhost:5500/upload";
 
-  const file = new FormData(document.querySelector("form"));
+  const form = document.querySelector("form");
+  const tBody = document.querySelector(".table tbody");
+
+  if (!form) {
+    throw new Error("There is no form to work with.");
+  }
+  const file: FormData = new FormData(form);
 
   try {
     await fetch(url, { method: "post", body: file });
-    document.querySelector(".table tbody").replaceChildren();
+
+    if (!tBody) {
+      throw new Error("There is no table body to work with.");
+    }
+    tBody.replaceChildren();
     renderFiles();
   } catch (error) {
     console.log(error);
   }
 }
 
-async function downloadReq(name) {
+async function downloadReq(name: string) {
   let url = `http://localhost:5500/download/${name}`;
   try {
     await fetch(url, { method: "get" });
@@ -41,12 +53,18 @@ async function downloadReq(name) {
   }
 }
 
-async function deleteReq(name) {
+async function deleteReq(name: string) {
   let url = `http://localhost:5500/remove/${name}`;
 
+  const tBody = document.querySelector(".table tbody");
+
   try {
-    await fetch(url, { method: "delete", body: { name } });
-    document.querySelector(".table tbody").replaceChildren();
+    await fetch(url, { method: "delete" });
+
+    if (!tBody) {
+      throw new Error("There is no table body to work with.");
+    }
+    tBody.replaceChildren();
     renderFiles();
   } catch (error) {
     console.log(error);
@@ -54,6 +72,10 @@ async function deleteReq(name) {
 }
 
 const main = document.querySelector("div#main");
+
+if (!main) {
+  throw new Error("There is no element with the id main.");
+}
 
 let pageHeader = document.createElement("h1");
 pageHeader.innerText = "Simple Cloud Storage";
@@ -71,10 +93,10 @@ main.appendChild(hr);
 const tableHeaders = ["File", "Size", "Download", "Delete"];
 createTable(tableHeaders);
 
-function createTable(tableHeaders) {
+function createTable(tableHeaders: string[]) {
   let table = document.createElement("table");
   table.className = "table";
-  table.id = "sortable";
+  //table.id = "sortable";
 
   let tableHead = document.createElement("thead");
   let tableHeadRow = document.createElement("tr");
@@ -82,7 +104,7 @@ function createTable(tableHeaders) {
   tableHeaders.forEach((header, index) => {
     let tableHeadCol = document.createElement("th");
     tableHeadCol.innerText = header;
-    tableHeadCol.setAttribute("click", `sortBy(${index})`);
+    //tableHeadCol.setAttribute("click", `sortBy(${index})`);
     tableHeadRow.append(tableHeadCol);
   });
 
@@ -92,15 +114,21 @@ function createTable(tableHeaders) {
   let tableBody = document.createElement("tbody");
 
   table.append(tableBody);
+
+  if (!main) {
+    throw new Error("There is no element with the id main.");
+  }
   main.append(table);
 }
 
-function appendData(file) {
+function appendData(file: File) {
   const tableBody = document.querySelector(".table tbody");
 
   let bodyRow = document.createElement("tr");
 
-  Object.keys(file).forEach((key) => {
+  const fileKeys = Object.keys(file) as Array<keyof typeof file>;
+
+  fileKeys.forEach((key) => {
     let keyElement = document.createElement("td");
     keyElement.innerText = file[key];
     bodyRow.append(keyElement);
@@ -126,6 +154,9 @@ function appendData(file) {
   delTD.append(del);
   bodyRow.append(delTD);
 
+  if (!tableBody) {
+    throw new Error("There is no table body to work with.");
+  }
   tableBody.append(bodyRow);
 }
 
@@ -156,5 +187,8 @@ function createUploadForm() {
     uploadFile();
   });
 
+  if (!main) {
+    throw new Error("There is no element with the id main.");
+  }
   main.appendChild(form);
 }

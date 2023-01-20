@@ -1,5 +1,5 @@
-const util = require("util");
-const multer = require("multer");
+import util from "util";
+import multer from "multer";
 
 //const maxSize = 2 * 1024 * 1024;
 
@@ -7,7 +7,7 @@ const fileFolder = "/resources/static/assets/uploads";
 
 let storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, `${__basedir}${fileFolder}`);
+    cb(null, `${process.cwd()}${fileFolder}`);
   },
   filename: (req, file, cb) => {
     cb(null, file.originalname);
@@ -22,4 +22,4 @@ let uploadFile = multer({
 
 let uploadFileMiddleware = util.promisify(uploadFile);
 
-module.exports = uploadFileMiddleware;
+export default uploadFileMiddleware;

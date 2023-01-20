@@ -1,12 +1,13 @@
-const fs = require("fs");
+import { Request, Response } from "express";
+import fs from "fs";
+import { Files } from "../types/types";
+import uploadFile from "../middleware/upload";
 
 const fileFolder = "/resources/static/assets/uploads";
-const directoryPath = `${__basedir}${fileFolder}`;
+const directoryPath = `${process.cwd()}${fileFolder}`;
 
-const uploadFile = require("../middleware/upload");
-
-const listFilesSync = (req, res) => {
-  let files = [];
+const listFilesSync = (req: Request, res: Response) => {
+  let files: Files[] = [];
 
   fs.readdirSync(directoryPath).forEach((file) => {
     let fileSize = fs.statSync(`${directoryPath}/${file}`).size + " b";
@@ -20,22 +21,20 @@ const listFilesSync = (req, res) => {
   res.status(200).json(files);
 };
 
-const listFiles = (req, res) => {
-  fs.readdir(directoryPath, (err, files) => {
-    if (err) {
-      res.status(500).send({ message: "Unable to scan files!" });
-    }
-
+const listFiles = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const files = await fs.promises.readdir(directoryPath);
     let fileInfos = files.map((file) => {
       let fileSize = fs.statSync(`${directoryPath}/${file}`).size + " b";
       return { name: file, size: fileSize };
     });
-
     res.status(200).send(fileInfos);
-  });
+  } catch (err) {
+    res.status(500).send({ message: "Unable to scan files!" });
+  }
 };
 
-const download = (req, res) => {
+const download = (req: Request, res: Response) => {
   const fileName = req.params.name;
 
   res.download(`${directoryPath}/${fileName}`, (err) => {
@@ -45,7 +44,7 @@ const download = (req, res) => {
   });
 };
 
-const remove = (req, res) => {
+const remove = (req: Request, res: Response) => {
   const fileName = req.params.name;
 
   fs.unlink(`${directoryPath}/${fileName}`, (err) => {
@@ -58,7 +57,7 @@ const remove = (req, res) => {
   });
 };
 
-const removeSync = (req, res) => {
+const removeSync = (req: Request, res: Response) => {
   const fileName = req.params.name;
 
   try {
@@ -69,7 +68,7 @@ const removeSync = (req, res) => {
   }
 };
 
-const upload = async (req, res) => {
+const upload = async (req: Request, res: Response) => {
   try {
     await uploadFile(req, res);
 
@@ -88,12 +87,12 @@ const upload = async (req, res) => {
     // }
 
     res.status(500).send({
-      message: `Could not upload file: ${req.file.originalname}. ${err}`,
+      message: `Could not upload file. ${err}`,
     });
   }
 };
 
-module.exports = {
+export default {
   remove,
   removeSync,
   listFilesSync,
