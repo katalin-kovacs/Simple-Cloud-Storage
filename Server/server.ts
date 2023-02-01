@@ -10,7 +10,7 @@ import initRoutes from "./src/routes";
 const app = express();
 const PORT = 5500;
 
-app.use(express.static("../Client/"));
+app.use(express.static("../client/"));
 
 const corsOptions: CorsOptions = {
   origin: `http://localhost:${PORT}`,
