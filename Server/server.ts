@@ -11,9 +11,11 @@ const app = express();
 const PORT = 5500;
 
 app.use(express.static("../client/"));
+//fe proxy be irányba
+//fe /api---> levág -->req to server
 
 const corsOptions: CorsOptions = {
-  origin: `http://localhost:${PORT}`,
+  origin: `http://localhost:3000`,
 };
 
 app.use(cors(corsOptions));

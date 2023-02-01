@@ -1,5 +1,5 @@
 import { File } from "./types";
-export const PORT = 3000;
+export const PORT = 5500;
 
 export async function getFiles(): Promise<File[] | void> {
   let url = `http://localhost:${PORT}/list`;
