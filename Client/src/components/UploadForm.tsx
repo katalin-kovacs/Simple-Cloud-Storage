@@ -1,6 +1,8 @@
+import { useStoreon } from "storeon/react";
 import { uploadFile } from "../services";
 
 export const UploadForm = (): JSX.Element => {
+  const { dispatch } = useStoreon();
   return (
     <form
       method="post"
@@ -9,6 +11,7 @@ export const UploadForm = (): JSX.Element => {
       onSubmit={(e) => {
         e.preventDefault();
         uploadFile();
+        dispatch("getFiles");
       }}
     >
       <label htmlFor="upload">Choose a file to upload.</label>

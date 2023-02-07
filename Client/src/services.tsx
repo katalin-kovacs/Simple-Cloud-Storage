@@ -1,7 +1,7 @@
 import { File } from "./types";
 export const PORT = 5500;
 
-export async function getFiles(): Promise<File[] | void> {
+export async function getFiles(): Promise<File[] | undefined> {
   let url = `http://localhost:${PORT}/list`;
 
   try {
@@ -9,6 +9,7 @@ export async function getFiles(): Promise<File[] | void> {
     return res.json();
   } catch (error) {
     console.log(error);
+    return undefined;
   }
 }
 
